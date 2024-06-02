@@ -7,6 +7,35 @@
   www.ros.org/wiki/octomap_server for details  
 -->
 <launch>
+
+
+
+  <node name="statistical_outlier_removal"
+        pkg="nodelet" type="nodelet"
+        args="standalone pcl/StatisticalOutlierRemoval">
+    <!-- <remap from="~input" to="voxel_grid/output" /> -->
+    <remap from="~input" to="/orb_slam3/all_points" />
+    <rosparam>
+      mean_k: 10
+      stddev: 1.0
+    </rosparam>
+  </node>
+
+  <test test-name="test_statistical_outlier_removal"
+        name="test_statistical_outlier_removal"
+        pkg="rostest" type="hztest">
+    <rosparam>
+      topic: /statistical_outlier_removal/output
+      hz: 20
+      hzerror: 15
+      test_duration: 5.0
+    </rosparam>
+  </test>
+
+
+
+
+
 	<node pkg="octomap_server" type="octomap_server_node" name="octomap_server">
 		<param name="resolution" value="0.05" />
 		
@@ -19,7 +48,8 @@
 		
 		<!-- data source to integrate (PointCloud2) -->
 		<!-- <remap from="cloud_in" to="/narrow_stereo/points_filtered2" /> -->
-		<remap from="cloud_in" to="/orb_slam3/all_points" />
+		<!-- <remap from="cloud_in" to="/orb_slam3/all_points" /> -->
+		<remap from="cloud_in" to="/statistical_outlier_removal/output" />
 
 		<param name="base_frame_id" value="world" />
 	
